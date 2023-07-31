@@ -49,7 +49,6 @@ Following our example these would look like this:
 ```fsharp
 module SignalRHub =
     open Fable.SignalR
-    open FSharp.Control.Tasks.V2
     open SignalRHub
 
     let update (msg: Action) =
@@ -158,7 +157,6 @@ Following our example the module would now look like this:
 module SignalRHub =
     open Fable.SignalR
     open FSharp.Control
-    open FSharp.Control.Tasks.V2
     open SignalRHub
     open System.Collections.Generic
 

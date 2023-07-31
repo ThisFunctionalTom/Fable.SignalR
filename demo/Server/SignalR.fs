@@ -3,7 +3,6 @@
 module SignalRHub =
     open Fable.SignalR
     open FSharp.Control
-    open FSharp.Control.Tasks.V2
     open SignalRHub
     
     let update (msg: Action) =

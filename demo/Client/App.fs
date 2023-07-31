@@ -1,10 +1,8 @@
 ﻿namespace SignalRApp
 
 module App =
-    open Fable.Core
     open Fable.SignalR
     open Feliz
-    open Feliz.Plotly
     open SignalRHub
     open Zanaptak.TypedCssClasses
 
@@ -30,53 +28,54 @@ module App =
                     | Error e -> failwithf "Authentication failed: %s" e
             }
 
-    let private graph = React.functionComponent(fun (input: {| dates: System.DateTime list; lows: float list; highs: float list |}) ->
-        Plotly.plot [
-            plot.traces [
-                traces.scatter [
-                    scatter.mode.lines
-                    scatter.name "AAPL High"
-                    scatter.x input.dates
-                    scatter.y input.highs
-                    scatter.line [
-                        line.color "#17BECF"
-                    ]
-                ]
-                traces.scatter [
-                    scatter.mode.lines
-                    scatter.name "AAPL Low"
-                    scatter.x input.dates
-                    scatter.y input.lows
-                    scatter.line [
-                        line.color "#7F7F7F"
-                    ]
-                ]
-            ]
-            plot.layout [
-                layout.title [
-                    title.text "Apple Stock Price"
-                ]
-                layout.xaxis [
-                    xaxis.range [ System.DateTime(2015, 2, 17); System.DateTime(2017, 2, 16) ]
-                    xaxis.type'.date
-                    xaxis.fixedrange true
-                ]
-                layout.yaxis [
-                    yaxis.range [ 86.8700008333; 138.870004167 ]
-                    yaxis.type'.linear
-                    yaxis.fixedrange true
-                ]
-                layout.transition [
-                    transition.duration 0
-                    transition.easing.linear
-                    transition.ordering.tracesFirst
-                ]
-            ]
-            plot.config [
-                config.displayModeBar.false'
-            ]
-        ])
+    // let private graph = React.functionComponent(fun (input: {| dates: System.DateTime list; lows: float list; highs: float list |}) ->
+    //     Plotly.plot [
+    //         plot.traces [
+    //             traces.scatter [
+    //                 scatter.mode.lines
+    //                 scatter.name "AAPL High"
+    //                 scatter.x input.dates
+    //                 scatter.y input.highs
+    //                 scatter.line [
+    //                     line.color "#17BECF"
+    //                 ]
+    //             ]
+    //             traces.scatter [
+    //                 scatter.mode.lines
+    //                 scatter.name "AAPL Low"
+    //                 scatter.x input.dates
+    //                 scatter.y input.lows
+    //                 scatter.line [
+    //                     line.color "#7F7F7F"
+    //                 ]
+    //             ]
+    //         ]
+    //         plot.layout [
+    //             layout.title [
+    //                 title.text "Apple Stock Price"
+    //             ]
+    //             layout.xaxis [
+    //                 xaxis.range [ System.DateTime(2015, 2, 17); System.DateTime(2017, 2, 16) ]
+    //                 xaxis.type'.date
+    //                 xaxis.fixedrange true
+    //             ]
+    //             layout.yaxis [
+    //                 yaxis.range [ 86.8700008333; 138.870004167 ]
+    //                 yaxis.type'.linear
+    //                 yaxis.fixedrange true
+    //             ]
+    //             layout.transition [
+    //                 transition.duration 0
+    //                 transition.easing.linear
+    //                 transition.ordering.tracesFirst
+    //             ]
+    //         ]
+    //         plot.config [
+    //             config.displayModeBar.false'
+    //         ]
+    //     ])
 
+    [<ReactComponent>]
     let display = React.functionComponent(fun (input: {| hub: Hub |}) ->
         let dates,setDates = React.useState([] : System.DateTime list)
         let lows,setLows = React.useState([]: float list)

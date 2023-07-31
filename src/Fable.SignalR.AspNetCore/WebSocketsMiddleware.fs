@@ -1,6 +1,5 @@
 ﻿namespace Fable.SignalR
 
-open FSharp.Control.Tasks.V2
 open Microsoft.AspNetCore.Http
 open Microsoft.Extensions.Primitives
 open System

@@ -229,7 +229,7 @@ module StreamingElmish =
 
             model, Cmd.batch [ 
                 Cmd.SignalR.streamTo model.Hub subject
-                Cmd.ofSub (fun dispatch ->
+                Cmd.ofEffect (fun dispatch ->
                     let dispatch = ClientStreamStatus >> dispatch
 
                     dispatch StreamStatus.Streaming

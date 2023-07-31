@@ -3,7 +3,7 @@
 open Feliz
 
 module Feliz =
-    type Hub<'ClientApi,'ServerApi> = Fable.React.IRefValue<Fable.SignalR.Hub<'ClientApi,'ServerApi>>
+    type Hub<'ClientApi,'ServerApi> = IRefValue<Fable.SignalR.Hub<'ClientApi,'ServerApi>>
 
     [<RequireQualifiedAccess>]
     module Hub =
@@ -37,61 +37,61 @@ module Feliz =
                 HubConnectionBuilder<'ClientApi,unit,'ClientStreamApi,'ServerApi,unit> 
                     -> HubConnectionBuilder<'ClientApi,unit,'ClientStreamApi,'ServerApi,unit>
 
-    type React with
+    type Feliz.React with
         static member inline useSignalR<'ClientApi,'ServerApi> (config: Hub.Config<'ClientApi,'ServerApi>, ?dependencies: obj []) =
-            let connection = React.useMemo((fun () -> SignalR.connect(config)), ?dependencies = dependencies)
-            let connection = React.useRef(connection)
+            let connection = Feliz.React.useMemo((fun () -> SignalR.connect(config)), ?dependencies = dependencies)
+            let connection = Feliz.React.useRef(connection)
 
-            React.useEffectOnce(fun () ->
+            Feliz.React.useEffectOnce(fun () ->
                 connection.current.startNow()
 
                 React.createDisposable(connection.current.stopNow)
             )
 
-            React.useRef(connection.current :> Fable.SignalR.Hub<'ClientApi,'ServerApi>)
+            Feliz.React.useRef(connection.current :> Fable.SignalR.Hub<'ClientApi,'ServerApi>)
         
         static member inline useSignalR<'ClientApi,'ClientStreamApi,'ServerApi,'ServerStreamApi> 
             (config: StreamHub.ServerToClient.Config<'ClientApi,'ClientStreamApi,'ServerApi,'ServerStreamApi>, ?dependencies: obj []) =
             
-            let connection = React.useMemo((fun () -> 
+            let connection = Feliz.React.useMemo((fun () -> 
                 SignalR.connect<'ClientApi,'ClientStreamApi,_,'ServerApi,'ServerStreamApi>(config)), ?dependencies = dependencies)
-            let connection = React.useRef(connection)
+            let connection = Feliz.React.useRef(connection)
 
-            React.useEffectOnce(fun () ->
+            Feliz.React.useEffectOnce(fun () ->
                 connection.current.startNow()
 
                 React.createDisposable(connection.current.stopNow)
             )
 
-            React.useRef(connection.current :> Fable.SignalR.StreamHub.ServerToClient<'ClientApi,'ClientStreamApi,'ServerApi,'ServerStreamApi>)
+            Feliz.React.useRef(connection.current :> Fable.SignalR.StreamHub.ServerToClient<'ClientApi,'ClientStreamApi,'ServerApi,'ServerStreamApi>)
 
         static member inline useSignalR<'ClientApi,'ClientStreamApi,'ServerApi> 
             (config: StreamHub.ClientToServer.Config<'ClientApi,'ClientStreamApi,'ServerApi>, ?dependencies: obj []) =
             
-            let connection = React.useMemo((fun () -> 
+            let connection = Feliz.React.useMemo((fun () -> 
                 SignalR.connect<'ClientApi,_,'ClientStreamApi,'ServerApi,_>(config)), ?dependencies = dependencies)
-            let connection = React.useRef(connection)
+            let connection = Feliz.React.useRef(connection)
 
-            React.useEffectOnce(fun () ->
+            Feliz.React.useEffectOnce(fun () ->
                 connection.current.startNow()
 
                 React.createDisposable(connection.current.stopNow)
             )
 
-            React.useRef(connection.current :> Fable.SignalR.StreamHub.ClientToServer<'ClientApi,'ClientStreamApi,'ServerApi>)
+            Feliz.React.useRef(connection.current :> Fable.SignalR.StreamHub.ClientToServer<'ClientApi,'ClientStreamApi,'ServerApi>)
 
         static member inline useSignalR<'ClientApi,'ClientStreamFromApi,'ClientStreamToApi,'ServerApi,'ServerStreamApi> 
             (config: StreamHub.Bidrectional.Config<'ClientApi,'ClientStreamFromApi,'ClientStreamToApi,'ServerApi,'ServerStreamApi>, 
              ?dependencies: obj []) =
             
-            let connection = React.useMemo((fun () -> 
+            let connection = Feliz.React.useMemo((fun () -> 
                 SignalR.connect<'ClientApi,'ClientStreamFromApi,'ClientStreamToApi,'ServerApi,'ServerStreamApi>(config)), ?dependencies = dependencies)
-            let connection = React.useRef(connection)
+            let connection = Feliz.React.useRef(connection)
 
-            React.useEffectOnce(fun () ->
+            Feliz.React.useEffectOnce(fun () ->
                 connection.current.startNow()
 
                 React.createDisposable(connection.current.stopNow)
             )
 
-            React.useRef(connection.current :> Fable.SignalR.StreamHub.Bidrectional<'ClientApi,'ClientStreamFromApi,'ClientStreamToApi,'ServerApi,'ServerStreamApi>)
+            Feliz.React.useRef(connection.current :> Fable.SignalR.StreamHub.Bidrectional<'ClientApi,'ClientStreamFromApi,'ClientStreamToApi,'ServerApi,'ServerStreamApi>)

@@ -4,6 +4,5 @@ group Fable
     Fable.Promise
     Fable.Remoting.Client
     Feliz
-    Feliz.Plotly
     FSharp.Core
     Zanaptak.TypedCssClasses

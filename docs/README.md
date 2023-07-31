@@ -55,8 +55,6 @@ let render = React.functionComponent(fun () ->
 
 ```fsharp
 module SignalRHub =
-    open FSharp.Control.Tasks.V2
-
     let update (msg: Action) =
         match msg with
         | Action.IncrementCount i -> Response.NewCount(i + 1)

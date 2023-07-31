@@ -1,12 +1,4 @@
-﻿group NetCoreApp3
-    Elmish
-    Fable.Remoting.Json
-    Fable.Remoting.MsgPack
-    FSharp.Core
-    Microsoft.AspNetCore.SignalR.Client
-    Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson
-
-group Net5
+group Net7
     Elmish
     Fable.Remoting.Json
     Fable.Remoting.MsgPack

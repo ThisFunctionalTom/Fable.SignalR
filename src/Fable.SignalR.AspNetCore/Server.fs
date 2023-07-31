@@ -1,7 +1,6 @@
 ﻿namespace Fable.SignalR
 
 open Fable.SignalR.Shared
-open FSharp.Control.Tasks.V2
 open Microsoft.AspNetCore.Builder
 open Microsoft.AspNetCore.SignalR
 open Microsoft.Extensions.DependencyInjection

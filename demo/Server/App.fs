@@ -7,7 +7,6 @@ module App =
     open Microsoft.Extensions.Logging
     open Saturn
     open System
-    open FSharp.Control.Tasks.V2
 
     module Setup =
         open SignalRApp.Auth

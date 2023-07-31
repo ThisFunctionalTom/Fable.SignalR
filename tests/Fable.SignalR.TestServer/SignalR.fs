@@ -1,7 +1,5 @@
 ﻿namespace SignalRApp
 
-open FSharp.Control.Tasks.V2
-
 type RandomStringGen () = 
     member _.Gen () =
         let characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
