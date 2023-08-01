@@ -3,7 +3,7 @@ namespace Tools.Linting
 [<RequireQualifiedAccess>]
 module FSharpLinter =
     open Fake.IO.FileSystemOperators
-    open FSharp.Compiler.Range
+    //open FSharp.Compiler.Range
     open FSharpLint.Application
     open FSharpLint.Framework
     open System
@@ -31,31 +31,31 @@ module FSharpLinter =
 
     let mutable private collectWarning = List.empty<string>
 
-    let getErrorMessage (range:FSharp.Compiler.Range.range) =
-        let error = Resources.GetString("LintSourceError")
+    // let getErrorMessage (range:FSharp.Compiler.Range.range) =
+    //     let error = Resources.GetString("LintSourceError")
 
-        String.Format(error, range.StartLine, range.StartColumn)
+    //     String.Format(error, range.StartLine, range.StartColumn)
 
-    let highlightErrorText (range:range) (errorLine:string) =
-        let highlightColumnLine =
-            if String.length errorLine = 0 then "^"
-            else
-                errorLine
-                |> Seq.mapi (fun i _ -> if i = range.StartColumn then "^" else " ")
-                |> Seq.reduce (+)
+    // let highlightErrorText (range:range) (errorLine:string) =
+    //     let highlightColumnLine =
+    //         if String.length errorLine = 0 then "^"
+    //         else
+    //             errorLine
+    //             |> Seq.mapi (fun i _ -> if i = range.StartColumn then "^" else " ")
+    //             |> Seq.reduce (+)
 
-        errorLine + Environment.NewLine + highlightColumnLine
+    //     errorLine + Environment.NewLine + highlightColumnLine
 
-    let private writeLintWarning (warning : Suggestion.LintWarning) =
-        let highlightedErrorText = highlightErrorText warning.Details.Range (getErrorMessage warning.Details.Range)
-        let warnMsg = warning.Details.Message + Environment.NewLine + highlightedErrorText + Environment.NewLine + warning.ErrorText
+    // let private writeLintWarning (warning : Suggestion.LintWarning) =
+    //     let highlightedErrorText = highlightErrorText warning.Details.Range (getErrorMessage warning.Details.Range)
+    //     let warnMsg = warning.Details.Message + Environment.NewLine + highlightedErrorText + Environment.NewLine + warning.ErrorText
 
-        collectWarning <- ((if collectWarning.Length > 0 then Environment.NewLine + warnMsg
-                            else warnMsg)
-                           :: collectWarning)
+    //     collectWarning <- ((if collectWarning.Length > 0 then Environment.NewLine + warnMsg
+    //                         else warnMsg)
+    //                        :: collectWarning)
 
-        warnMsg |> writeWarningLine
-        String.replicate 80 "*" |> writeInfoLine
+    //     warnMsg |> writeWarningLine
+    //     String.replicate 80 "*" |> writeInfoLine
 
     let private handleError (str: string) = writeErrorLine str
 
@@ -70,10 +70,10 @@ module FSharpLinter =
             else ConfigurationParam.Default
 
         { CancellationToken = None
-          ReceivedWarning = Some writeLintWarning
+          ReceivedWarning = None
           Configuration = config
           ReportLinterProgress = Some parserProgress }
-          
+
     let lintFiles (fileList: (bool * string list) list) =
         let lintFile (webFile: bool) (file: string) =
             let sw = Diagnostics.Stopwatch.StartNew()

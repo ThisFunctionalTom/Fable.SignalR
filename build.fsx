@@ -2,10 +2,35 @@
 // FAKE build script
 // --------------------------------------------------------------------------------------
 #nowarn "0213"
-#r "paket: groupref FakeBuild //"
+
+#r "nuget: Fake.Core"
+#r "nuget: Fake.Core.Target"
+#r "nuget: MSBuild.StructuredLogger, 2.1.820"
+#r "nuget: Fake.Core.ReleaseNotes"
+#r "nuget: Fake.DotNet.AssemblyInfoFile"
+#r "nuget: Fake.DotNet.Cli"
+#r "nuget: Fake.DotNet.MSBuild"
+#r "nuget: Fake.DotNet.Paket"
+#r "nuget: Fake.IO.FileSystem"
+#r "nuget: Fake.JavaScript.Npm"
+#r "nuget: Fake.JavaScript.Yarn"
+#r "nuget: Fake.Tools.Git"
+#r "nuget: FSharp.Json"
+#r "nuget: FSharpLint.Core"
+#r "nuget: NuGet.Packaging"
+#r "nuget: FSharp.Compiler.Service"
+
+//#load ".fake/build.fsx/intellisense.fsx"
+System.Environment.GetCommandLineArgs()
+|> Array.skip 2 // skip fsi.exe; build.fsx
+|> Array.toList
+|> Fake.Core.Context.FakeExecutionContext.Create false __SOURCE_FILE__
+|> Fake.Core.Context.RuntimeContext.Fake
+|> Fake.Core.Context.setExecutionContext
+
+
 #load "./tools/FSharpLint.fs"
 #load "./tools/Web.fs"
-#load "./.fake/build.fsx/intellisense.fsx"
 
 open Fake.Core
 open Fake.Core.TargetOperators
@@ -37,7 +62,7 @@ let solutionFile = "Fable.SignalR.sln"
 let repo = "https://github.com/Shmew/Fable.SignalR"
 
 // Files that have bindings to other languages where name linting needs to be more relaxed.
-let relaxedNameLinting = 
+let relaxedNameLinting =
     [ __SOURCE_DIRECTORY__ @@ "src/Fable.SignalR/*.fs"
       __SOURCE_DIRECTORY__ @@ "src/Fable.SignalR.Elmish/*.fs"
       __SOURCE_DIRECTORY__ @@ "src/Fable.SignalR.Feliz/*.fs"
@@ -55,7 +80,7 @@ let (|Fsproj|Csproj|Vbproj|Shproj|) (projFileName:string) =
     | f when f.EndsWith("vbproj") -> Vbproj
     | f when f.EndsWith("shproj") -> Shproj
     | _                           -> failwith (sprintf "Project file %s not supported. Unknown project type." projFileName)
-    
+
 let srcGlob        = __SOURCE_DIRECTORY__ @@ "src" @@ "**" @@ "*.??proj"
 let fsSrcGlob      = __SOURCE_DIRECTORY__ @@ "src" @@ "**" @@ "*.fs"
 let fsTestGlob     = __SOURCE_DIRECTORY__ @@ "tests" @@ "**" @@ "*.fs"
@@ -231,7 +256,7 @@ Target.create "Lint" <| fun _ ->
 
 Target.create "RunTests" <| fun _ ->
     Target.activateFinal "KillProcess"
-    
+
     !! (__SOURCE_DIRECTORY__ @@ "tests" @@ "**" @@ "bin" @@ configuration() @@ "**" @@ "*Tests.exe")
         |> Seq.iter (fun f ->
             killProcs()
@@ -244,7 +269,7 @@ Target.create "RunTests" <| fun _ ->
             |> ignore)
 
 // --------------------------------------------------------------------------------------
-// Update package.json version & name    
+// Update package.json version & name
 
 Target.create "PackageJson" <| fun _ ->
     let setValues (current: Json.JsonPackage) =
@@ -253,22 +278,22 @@ Target.create "PackageJson" <| fun _ ->
             Version = release.NugetVersion |> Some
             Description = summary |> Some
             Homepage = repo |> Some
-            Repository = 
+            Repository =
                 { Json.RepositoryValue.Type = "git" |> Some
                   Json.RepositoryValue.Url = repo |> Some
                   Json.RepositoryValue.Directory = None }
                 |> Some
-            Bugs = 
-                { Json.BugsValue.Url = 
+            Bugs =
+                { Json.BugsValue.Url =
                     @"https://github.com/Shmew/Fable.SignalR/issues/new/choose" |> Some } |> Some
             License = "MIT" |> Some
             Author = author |> Some
             Private = true |> Some }
-    
+
     Json.setJsonPkg setValues
 
 Target.create "Start" <| fun _ ->
-    Yarn.exec "start" id 
+    Yarn.exec "start" id
 
 Target.create "PublishPages" <| fun _ ->
     Yarn.exec "publish-docs" id
@@ -289,7 +314,7 @@ Target.create "NuGet" <| fun _ ->
 Target.create "NuGetPublish" <| fun _ ->
     Paket.push(fun p ->
         { p with
-            ApiKey = 
+            ApiKey =
                 match getEnvFromAllOrNone "NUGET_KEY" with
                 | Some key -> key
                 | None -> failwith "The NuGet API key must be set in a NUGET_KEY environment variable"
@@ -354,14 +379,14 @@ Target.create "CI" ignore
     ==> "NuGet"
     ?=> "NuGetPublish"
 
-"PrepDocs" 
+"PrepDocs"
     ==> "PublishPages"
     ==> "PublishDocs"
 
-"All" 
+"All"
     ==> "PrepDocs"
 
-"All" 
+"All"
     ==> "PrepDocs"
     ==> "Start"
 
