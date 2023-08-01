@@ -1,13 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
+    <RootNamespace>builder</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="fsharplint.json" />
-    <Compile Include="FSharpLint.fs" />
-    <Compile Include="Web.fs" />
-    <None Include="paket.references" />
+    <Compile Include="build.fs" />
+    <Content Include="paket.references" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\tools\tools.fsproj" />
   </ItemGroup>
   <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>

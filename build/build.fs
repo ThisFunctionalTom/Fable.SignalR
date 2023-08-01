@@ -1,13 +1,4 @@
-// --------------------------------------------------------------------------------------
-// FAKE build script
-// --------------------------------------------------------------------------------------
-#nowarn "0213"
-#r "paket: groupref FakeBuild //"
-#load "./tools/FSharpLint.fs"
-#load "./tools/Web.fs"
-#load "./.fake/build.fsx/intellisense.fsx"
-
-open Fake.Core
+﻿open Fake.Core
 open Fake.Core.TargetOperators
 open Fake.DotNet
 open Fake.JavaScript
@@ -18,6 +9,13 @@ open Fake.Tools
 open Tools.Linting
 open Tools.Web
 open System
+
+System.Environment.GetCommandLineArgs()
+|> Array.skip 1 // skip fsi.exe; build.fsx
+|> Array.toList
+|> Fake.Core.Context.FakeExecutionContext.Create false __SOURCE_FILE__
+|> Fake.Core.Context.RuntimeContext.Fake
+|> Fake.Core.Context.setExecutionContext
 
 // The name of the project
 // (used by attributes in AssemblyInfo, name of a NuGet package and directory in 'src')
@@ -36,16 +34,18 @@ let solutionFile = "Fable.SignalR.sln"
 // Github repo
 let repo = "https://github.com/Shmew/Fable.SignalR"
 
+let projectRoot = __SOURCE_DIRECTORY__ @@ "../"
+
 // Files that have bindings to other languages where name linting needs to be more relaxed.
 let relaxedNameLinting = 
-    [ __SOURCE_DIRECTORY__ @@ "src/Fable.SignalR/*.fs"
-      __SOURCE_DIRECTORY__ @@ "src/Fable.SignalR.Elmish/*.fs"
-      __SOURCE_DIRECTORY__ @@ "src/Fable.SignalR.Feliz/*.fs"
-      __SOURCE_DIRECTORY__ @@ "src/Fable.SignalR.Shared/*.fs"
-      __SOURCE_DIRECTORY__ @@ "tests/**/*.fs" ]
+    [ projectRoot @@ "../src/Fable.SignalR/*.fs"
+      projectRoot @@ "../src/Fable.SignalR.Elmish/*.fs"
+      projectRoot @@ "../src/Fable.SignalR.Feliz/*.fs"
+      projectRoot @@ "../src/Fable.SignalR.Shared/*.fs"
+      projectRoot @@ "../tests/**/*.fs" ]
 
 // Read additional information from the release notes document
-let release = ReleaseNotes.load (__SOURCE_DIRECTORY__ @@ "RELEASE_NOTES.md")
+let release = ReleaseNotes.load (projectRoot @@ "RELEASE_NOTES.md")
 
 // Helper active pattern for project types
 let (|Fsproj|Csproj|Vbproj|Shproj|) (projFileName:string) =
@@ -56,17 +56,17 @@ let (|Fsproj|Csproj|Vbproj|Shproj|) (projFileName:string) =
     | f when f.EndsWith("shproj") -> Shproj
     | _                           -> failwith (sprintf "Project file %s not supported. Unknown project type." projFileName)
     
-let srcGlob        = __SOURCE_DIRECTORY__ @@ "src" @@ "**" @@ "*.??proj"
-let fsSrcGlob      = __SOURCE_DIRECTORY__ @@ "src" @@ "**" @@ "*.fs"
-let fsTestGlob     = __SOURCE_DIRECTORY__ @@ "tests" @@ "**" @@ "*.fs"
-let bin            = __SOURCE_DIRECTORY__ @@ "bin"
-let docs           = __SOURCE_DIRECTORY__ @@ "docs"
-let temp           = __SOURCE_DIRECTORY__ @@ "temp"
-let objFolder      = __SOURCE_DIRECTORY__ @@ "obj"
-let dist           = __SOURCE_DIRECTORY__ @@ "dist"
-let libGlob        = __SOURCE_DIRECTORY__ @@ "src" @@ "**" @@ "*.fsproj"
-let demoGlob       = __SOURCE_DIRECTORY__ @@ "demo" @@ "**" @@ "*.fsproj"
-let dotnetTestGlob = __SOURCE_DIRECTORY__ @@ "tests" @@ "*DotNet*" @@ "*.fsproj"
+let srcGlob        = projectRoot @@ "src" @@ "**" @@ "*.??proj"
+let fsSrcGlob      = projectRoot @@ "src" @@ "**" @@ "*.fs"
+let fsTestGlob     = projectRoot @@ "tests" @@ "**" @@ "*.fs"
+let bin            = projectRoot @@ "bin"
+let docs           = projectRoot @@ "docs"
+let temp           = projectRoot @@ "temp"
+let objFolder      = projectRoot @@ "obj"
+let dist           = projectRoot @@ "dist"
+let libGlob        = projectRoot @@ "src" @@ "**" @@ "*.fsproj"
+let demoGlob       = projectRoot @@ "demo" @@ "**" @@ "*.fsproj"
+let dotnetTestGlob = projectRoot @@ "tests" @@ "*DotNet*" @@ "*.fsproj"
 
 let foldExcludeGlobs (g: IGlobbingPattern) (d: string) = g -- d
 let foldIncludeGlobs (g: IGlobbingPattern) (d: string) = g ++ d
@@ -74,17 +74,17 @@ let foldIncludeGlobs (g: IGlobbingPattern) (d: string) = g ++ d
 let fsSrcAndTest =
     !! fsSrcGlob
     ++ fsTestGlob
-    -- (__SOURCE_DIRECTORY__  @@ "src/**/obj/**")
-    -- (__SOURCE_DIRECTORY__  @@ "tests/**/obj/**")
-    -- (__SOURCE_DIRECTORY__  @@ "src/**/AssemblyInfo.*")
-    -- (__SOURCE_DIRECTORY__  @@ "src/**/**/AssemblyInfo.*")
+    -- (projectRoot  @@ "src/**/obj/**")
+    -- (projectRoot  @@ "tests/**/obj/**")
+    -- (projectRoot  @@ "src/**/AssemblyInfo.*")
+    -- (projectRoot  @@ "src/**/**/AssemblyInfo.*")
 
 let fsRelaxedNameLinting =
     let baseGlob s =
         !! s
-        -- (__SOURCE_DIRECTORY__  @@ "src/**/AssemblyInfo.*")
-        -- (__SOURCE_DIRECTORY__  @@ "src/**/obj/**")
-        -- (__SOURCE_DIRECTORY__  @@ "tests/**/obj/**")
+        -- (projectRoot  @@ "src/**/AssemblyInfo.*")
+        -- (projectRoot  @@ "src/**/obj/**")
+        -- (projectRoot  @@ "tests/**/obj/**")
     match relaxedNameLinting with
     | [h] when relaxedNameLinting.Length = 1 -> baseGlob h |> Some
     | h::t -> List.fold foldIncludeGlobs (baseGlob h) t |> Some
@@ -134,12 +134,12 @@ Target.create "ConfigRelease" <| fun _ ->
 
 Target.create "Clean" <| fun _ ->
     let clean() =
-        !! (__SOURCE_DIRECTORY__  @@ "tests/**/bin")
-        ++ (__SOURCE_DIRECTORY__  @@ "tests/**/obj")
-        ++ (__SOURCE_DIRECTORY__  @@ "tools/bin")
-        ++ (__SOURCE_DIRECTORY__  @@ "tools/obj")
-        ++ (__SOURCE_DIRECTORY__  @@ "src/**/bin")
-        ++ (__SOURCE_DIRECTORY__  @@ "src/**/obj")
+        !! (projectRoot  @@ "tests/**/bin")
+        ++ (projectRoot  @@ "tests/**/obj")
+        ++ (projectRoot  @@ "tools/bin")
+        ++ (projectRoot  @@ "tools/obj")
+        ++ (projectRoot  @@ "src/**/bin")
+        ++ (projectRoot  @@ "src/**/obj")
         |> Seq.toList
         |> List.append [bin; temp; objFolder; dist]
         |> Shell.cleanDirs
@@ -154,7 +154,7 @@ Target.create "CleanDocs" <| fun _ ->
     TaskRunner.runWithRetries clean 10
 
 Target.create "CopyDocFiles" <| fun _ ->
-    [ docs @@ "RELEASE_NOTES.md", __SOURCE_DIRECTORY__ @@ "RELEASE_NOTES.md" ]
+    [ docs @@ "RELEASE_NOTES.md", projectRoot @@ "RELEASE_NOTES.md" ]
     |> List.iter (fun (target, source) -> Shell.copyFile target source)
 
 Target.create "PrepDocs" ignore
@@ -173,7 +173,7 @@ Target.create "YarnInstall" <| fun _ ->
     if Environment.isWindows then
         let setParams (defaults:Yarn.YarnParams) =
             { defaults with
-                Yarn.YarnParams.YarnFilePath = (__SOURCE_DIRECTORY__ @@ "packages/tooling/Yarnpkg.Yarn/content/bin/yarn.cmd")
+                Yarn.YarnParams.YarnFilePath = (projectRoot @@ "packages/tooling/Yarnpkg.Yarn/content/bin/yarn.cmd")
             }
         Yarn.install setParams
     else Yarn.install id
@@ -215,7 +215,7 @@ Target.create "Build" <| fun _ ->
 
 Target.create "Lint" <| fun _ ->
     fsSrcAndTest
-    -- (__SOURCE_DIRECTORY__  @@ "src/**/AssemblyInfo.*")
+    -- (projectRoot  @@ "src/**/AssemblyInfo.*")
     |> (fun src -> List.fold foldExcludeGlobs src relaxedNameLinting)
     |> (fun fGlob ->
         match fsRelaxedNameLinting with
@@ -232,7 +232,7 @@ Target.create "Lint" <| fun _ ->
 Target.create "RunTests" <| fun _ ->
     Target.activateFinal "KillProcess"
     
-    !! (__SOURCE_DIRECTORY__ @@ "tests" @@ "**" @@ "bin" @@ configuration() @@ "**" @@ "*Tests.exe")
+    !! (projectRoot @@ "tests" @@ "**" @@ "bin" @@ configuration() @@ "**" @@ "*Tests.exe")
         |> Seq.iter (fun f ->
             killProcs()
 
